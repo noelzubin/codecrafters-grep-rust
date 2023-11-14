@@ -3,12 +3,18 @@ use std::io;
 use std::process;
 
 fn match_pattern(input_line: &str, pattern: &str) -> bool {
-    if pattern.chars().count() == 1 {
-        return input_line.contains(pattern);
-    } else if pattern == r"\d" {
-        return input_line.chars().any(|c| c.is_ascii_digit())
-    } else {
-        panic!("Unhandled pattern: {}", pattern)
+    let mut chars = pattern.chars();
+
+    match chars.next() {
+        Some('\\') => {
+            match chars.next() {
+                Some('d') => return input_line.chars().any(|c| c.is_ascii_digit()),
+                Some('w') => return input_line.chars().any(|c| c.is_alphanumeric()),
+                _ => panic!("unhandled pattern {}", pattern),
+            }
+        }
+        Some(ch) => return input_line.contains(ch),
+        _ => panic!("unhandled pattern {}", pattern),
     }
 }
 
